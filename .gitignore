@@ -1,5 +1,4 @@
-tracerpki
-
 .vscode/*
 .history/
 *.vsix
+/tracerpki
