@@ -1,17 +1,20 @@
 module github.com/mellowdrifter/tracerpki
 
-go 1.18
+go 1.19
 
 replace github.com/mellowdrifter/bgp_infrastructure/proto/glass => ../bgp_infrastructure/proto/glass
 
-require github.com/mellowdrifter/bgp_infrastructure/proto/glass v0.0.0-00010101000000-000000000000
+replace github.com/mellowdrifter/go-bgpstuff.net => ../go-bgpstuff.net
 
 require (
-	github.com/golang/protobuf v1.5.2 // indirect
-	golang.org/x/net v0.0.0-20200822124328-c89045814202 // indirect
-	golang.org/x/sys v0.0.0-20200323222414-85ca7c5b95cd // indirect
-	golang.org/x/text v0.3.0 // indirect
-	google.golang.org/genproto v0.0.0-20200526211855-cb27e3aa2013 // indirect
-	google.golang.org/grpc v1.43.0 // indirect
-	google.golang.org/protobuf v1.26.0 // indirect
+	github.com/mellowdrifter/go-bgpstuff.net v0.0.0-20220507215736-e57e864fa24b
+	github.com/spf13/cobra v1.6.0
+)
+
+require (
+	github.com/google/go-cmp v0.5.8 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/mellowdrifter/bogons v1.0.0 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/time v0.0.0-20220609170525-579cf78fd858 // indirect
 )
