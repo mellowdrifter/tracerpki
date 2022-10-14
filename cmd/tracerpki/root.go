@@ -23,9 +23,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
-var version = "0.0.1"
+const version = "0.1"
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -36,19 +34,43 @@ var rootCmd = &cobra.Command{
 	Long: `traceroute replacement that gives RPKI, AS number, and AS name per hop
 
 Usage:
-  traceroute [ -46dFITnreAUDV ] [ -f first_ttl ] [ -g gate,... ] [ -i device ] [ -m max_ttl ] [ -N squeries ] [ -p port ] [ -t tos ] [ -l flow_label ] [ -w MAX,HERE,NEAR ] [ -q nqueries ] [ -s src_addr ] [ -z sendwait ] [ --fwmark=num ] host [ packetlen ]
+  traceroute [ -46dFITnreAUDV ] [ -f first_ttl ] [ -m max_ttl ] [ -N squeries ] [ -p port ] [ -t tos ] [ -q nqueries ] [ -s src_addr ] host 
 Options:
-  -4                          Use IPv4
-  -6                          Use IPv6
-  -d  --debug                 Enable socket level debugging
   -F  --dont-fragment         Do not fragment packets
 
 `,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		tracerpki.Trace("8.8.8.8")
+		opts := getOptions(cmd)
+		//TODO: Move this into get Options
+		opts.Location = args[0]
+		fmt.Printf("options are %+v\n", opts)
+		tracerpki.Trace(*opts)
 	},
+}
+
+func getOptions(cmd *cobra.Command) *tracerpki.Args {
+	var opt tracerpki.Args
+
+	v6, err := cmd.Flags().GetBool("ipv6")
+	if err != nil {
+		panic(err)
+	}
+
+	v4, err := cmd.Flags().GetBool("ipv4")
+	if err != nil {
+		panic(err)
+	}
+
+	max_ttl, err := cmd.Flags().GetUint("max_ttl")
+	if err != nil {
+		panic(err)
+	}
+
+	opt.V6 = v6
+	opt.V4 = v4
+	opt.MaxTTL = max_ttl
+
+	return &opt
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -58,4 +80,10 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+func init() {
+	rootCmd.Flags().BoolP("ipv6", "6", false, "Use IPv6 (default)")
+	rootCmd.Flags().BoolP("ipv4", "4", true, "Use IPv4")
+	rootCmd.Flags().UintP("max_ttl", "m", 30, "Set the max number of hops (max TTL to be reached). Default is 30")
 }

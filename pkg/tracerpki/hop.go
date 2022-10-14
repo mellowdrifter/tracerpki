@@ -7,7 +7,7 @@ import (
 )
 
 type hop struct {
-	hop        int
+	hop        uint
 	asNumber   int
 	address    netip.Addr
 	asName     string

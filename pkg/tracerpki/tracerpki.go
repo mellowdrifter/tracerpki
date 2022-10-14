@@ -28,14 +28,17 @@ var (
 )
 
 type Args struct {
-	location string
-	hops     int
-	tcp      bool
-	icmp     bool
+	Location string
+	TCP      bool
+	ICMP     bool
+	V6       bool
+	V4       bool
+	MaxTTL   uint
+	FirstTTL uint
 }
 
 // func Trace(args Args) error {
-func Trace(dst string) error {
+func Trace(args Args) error {
 	// find the local address
 	v4Local, _, err := getSocketAddress()
 	if err != nil {
@@ -44,7 +47,7 @@ func Trace(dst string) error {
 
 	// where are we trying to get to?
 	//destAddr, err := getDestinationAddresses(args.location)
-	destAddr, err := getDestinationAddresses(dst)
+	destAddr, err := getDestinationAddresses(args.Location)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,19 +71,18 @@ func Trace(dst string) error {
 	// set timeouts
 	timeout := syscall.NsecToTimeval(1000000 * int64(*timeoutMS))
 
-	//fmt.Printf("traceroute to %s (%s), %d hops max, using %s as source\n", args.location, destAddr, args.hops, v4Local)
-	fmt.Printf("tracerpki to %s (%s), %d hops max, using %s as source\n", dst, destAddr, 20, v4Local)
+	fmt.Printf("tracerpki to %s (%s), %d hops max, using %s as source\n", args.Location, destAddr, args.MaxTTL, v4Local)
 
 	// TODO: Maybe good to have a context? Users may cancel request
 	// ctx := context.TODO()
 
 	//for ttl := 1; ttl < args.hops; ttl++ {
-	for ttl := 1; ttl < 20; ttl++ {
+	for ttl := uint(1); ttl < args.MaxTTL; ttl++ {
 		start := time.Now()
 		hop := hop{hop: ttl}
 
 		// set the ttl and timeouts on the socket
-		syscall.SetsockoptInt(sender, 0x0, syscall.IP_TTL, ttl)
+		syscall.SetsockoptInt(sender, 0x0, syscall.IP_TTL, int(ttl))
 		syscall.SetsockoptTimeval(receiver, syscall.SOL_SOCKET, syscall.SO_RCVTIMEO, &timeout)
 		//err = syscall.SetsockoptInt(sender, syscall.SOL_IP, syscall.IP_RECVERR, 1)
 		//if err != nil {
